@@ -1,7 +1,3 @@
-USE mydb;
-GRANT ALL PRIVILEGES ON mydb.* TO 'myuser'@'%';
-FLUSH PRIVILEGE;
-
 CREATE TABLE USERS (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username TEXT,
@@ -15,6 +11,7 @@ CREATE TABLE USERS (
 CREATE TABLE POSTS (
     post_id INT AUTO_INCREMENT PRIMARY KEY,
     username TEXT,
+    
     title TEXT,
     content TEXT,
     views INTEGER DEFAULT 0,
