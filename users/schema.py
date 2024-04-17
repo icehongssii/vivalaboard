@@ -19,11 +19,11 @@ TypeError: 'SecretStr' object is not iterable
 
 
 class UserBase(BaseModel):
-	username: str
 	email: EmailStr 
 
 # 유저가 회원가입할떄는  username, email, password만 잇으면된다 
 class UserCreate(UserBase):
+    username: str
     password: SecretStr
     # 아래의 field_validor대신에 regular expression을 쓰는 것도 방법이다
     # regex=r'(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*])'
