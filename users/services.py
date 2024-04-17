@@ -12,6 +12,10 @@ def create_user(db: Session, user:schema.UserCreate) -> model.User:
     db.refresh(db_user) # refresh your instance (so that it contains any new data from the database, like the generated ID).
     return db_user
 
+
+def verify_password(password, hashed_password) -> bool:
+    return PWD_CONTEXT.verify(password, hashed_password)
+    
 def find_user_with_email(db: Session, email:str) -> int:
         return db.query(model.User).filter(model.User.email == email).first()
     

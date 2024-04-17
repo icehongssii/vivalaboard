@@ -58,3 +58,6 @@ class UserCreate(UserBase):
         if not any(char.isdigit() for char in secret_value):
             raise ValueError('must contains at least 1 digit')
         return pwd    
+
+class UserLogin(UserBase):
+    password: SecretStr
