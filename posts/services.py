@@ -18,3 +18,5 @@ def get_posts(db, pagenation):
         .offset((pagenation.page - 1) * pagenation.perPage)\
         .all()    
     
+def get_one_post(db, pid):
+    return db.query(model.Post).filter_by(post_id=pid).first()
