@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
@@ -11,6 +11,30 @@ router = APIRouter()
 OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="token")
 
 
+# 정보수정 완료 버튼 눌렀을때
+# 수정완료가 일어난다
+# 정보
+@router.post("/edit")
+def edit_user_info(req:Request, user:schema.UserEdit, db:Session=Depends(get_db)):
+    if not req.user:
+        raise HTTPException(status_code=403, detail = "로그인하고오세요!")     
+    user_id = int(req.user)
+    user.user_id = user_id
+    return services.update_user_info(db,user)
+
+
+
+# 정보 수정에 접근하기 위해서 
+# 현재 유저의 비밀번호 확인
+@router.post("/validate")
+def validate_user_with_pwd(req:Request, pwd:schema.UserValidate, db:Session=Depends(get_db)):
+    if not req.user:
+        raise HTTPException(status_code=403, detail = "로그인하고오세요!")     
+    user_id = int(req.user)
+    db_pwd = services._get_current_user(db,user_id).password   
+    if not services.verify_password(pwd.password.get_secret_value(), db_pwd):
+        raise HTTPException(status_code=403, detail="비밀번호가 틀려서 안됨")
+    return True
 
 
 # /users/join

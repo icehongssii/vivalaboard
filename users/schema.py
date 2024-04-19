@@ -23,8 +23,8 @@ class UserBase(BaseModel):
 
 # 유저가 회원가입할떄는  username, email, password만 잇으면된다 
 class UserCreate(UserBase):
-    username: str
-    password: SecretStr
+    username: str = None
+    password: SecretStr = None
     # 아래의 field_validor대신에 regular expression을 쓰는 것도 방법이다
     # regex=r'(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*])'
     
@@ -61,3 +61,12 @@ class UserCreate(UserBase):
 
 class UserLogin(UserBase):
     password: SecretStr
+
+class UserValidate(BaseModel):
+    password: SecretStr
+
+class UserEdit(BaseModel):
+    user_id: int = None
+    username: str = None
+    password: SecretStr
+        

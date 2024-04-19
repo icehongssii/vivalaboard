@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import update
 from . import model, schema
 from auth import model as authModel
 from passlib.context import CryptContext
@@ -16,6 +17,15 @@ def create_user(db: Session, user:schema.UserCreate) -> model.User:
     db.commit()
     db.refresh(db_user) # refresh your instance (so that it contains any new data from the database, like the generated ID).
     return db_user
+
+def update_user_info(db: Session, user:schema.UserEdit):
+    qry =update(model.User).where(model.User.user_id == user.user_id)\
+        .values(username=user.username,
+                password=user.password.get_secret_value()
+                )
+    db.execute(qry)
+    db.commit()
+    return user
 
 
 def verify_password(password, hashed_password) -> bool:
