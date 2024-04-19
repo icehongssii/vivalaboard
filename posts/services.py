@@ -3,13 +3,24 @@ from db import get_db
 from fastapi import Depends
 from . import model, schema
 from users import model as user_model
-from sqlalchemy import desc, asc,update
+from sqlalchemy import desc, asc,update, delete
 from datetime import datetime, timedelta, timezone
 KST = timezone(timedelta(hours=9))
 
+def delete_post(db, post_id):
+    qry = delete(model.Post).where(model.Post.post_id==post_id)
+    db.execute(qry)
+    db.commit()
+    return post_id
+
+def get_writer_id(db, post_id):
+    return db.query(model.Post).filter(model.Post.post_id==post_id).first()
+
 def edit_post(db,post):    
     update_stmt = update(model.Post).where(model.Post.post_id == post.post_id)\
-                      .values(content=post.content, title=post.title, updated_at=datetime.now(KST))
+                      .values(content=post.content, 
+                              title=post.title, 
+                              updated_at=datetime.now(KST))
     db.execute(update_stmt)
     db.commit()
     return post    
@@ -43,6 +54,7 @@ def get_posts(db, pagenation):
     
 def get_one_post(db, pid):
     post = db.query(model.Post).filter_by(post_id=pid).first()
+    # 수정한적이 없다면 빈 값
     if post.created_at == post.updated_at:
         post.updated_at = ""
     return post

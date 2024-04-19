@@ -6,6 +6,18 @@ from db import get_db
 router = APIRouter()
 from starlette.authentication import requires
 
+#삭제
+@router.get("/delete")
+def delete_post(req:Request,post_id:int, db:Session=Depends(get_db)):
+    post_user_id = services.get_writer_id(db,post_id).user_id
+    if not req.user:     
+        raise HTTPException(status_code=403, detail = "로그인하고오세요!")     
+    user_id = int(req.user)
+    if user_id != post_user_id:
+        raise HTTPException(status_code=403, detail = "작성자만 수정할 수 있어요")     
+    print(services.delete_post(db,post_id),"삭제")
+    return {"result":"success", "deleted_post_id":post_id}
+
 # 기본페이지
 @router.get("/")
 def get_post_list(pagenation=Depends(schema.Pagination), db:Session = Depends(get_db)):
