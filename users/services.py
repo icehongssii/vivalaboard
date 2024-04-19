@@ -48,6 +48,6 @@ def generate_login_token(db: Session, user_info:schema.UserLogin):
     db.commit()
     db.refresh(token)
         
-    at  = auth.generate_tokens(user_info.user_id, datetime.now(KST) + timedelta(seconds=1))    
+    at  = auth.generate_tokens(user_info.user_id, datetime.now(KST) + timedelta(minutes=1440))
     
     return {"rt":rt, "at":at}
