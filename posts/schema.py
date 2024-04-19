@@ -21,3 +21,6 @@ class PostWrite(Post):
     user_id:int = None
     title: str=Field(max_length=100, min_length=1)
     content: str=Field( min_length=1)
+
+class PostEditReq(PostWrite):
+    post_id:int

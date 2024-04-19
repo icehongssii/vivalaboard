@@ -3,14 +3,24 @@ from db import get_db
 from fastapi import Depends
 from . import model, schema
 from users import model as user_model
-from sqlalchemy import desc, asc
-from starlette.authentication import requires
+from sqlalchemy import desc, asc,update
+from datetime import datetime, timedelta, timezone
+KST = timezone(timedelta(hours=9))
+
+def edit_post(db,post):    
+    update_stmt = update(model.Post).where(model.Post.post_id == post.post_id)\
+                      .values(content=post.content, title=post.title, updated_at=datetime.now(KST))
+    db.execute(update_stmt)
+    db.commit()
+    return post    
 
 def create_post(db, post):
     postData = model.Post(
         user_id = post.user_id, 
         title = post.title,
-        content = post.content
+        content = post.content,
+        created_at = datetime.now(KST),
+        updated_at = datetime.now(KST)
     )
     db.add(postData)
     db.commit()
@@ -32,4 +42,7 @@ def get_posts(db, pagenation):
         .all()    
     
 def get_one_post(db, pid):
-    return db.query(model.Post).filter_by(post_id=pid).first()
+    post = db.query(model.Post).filter_by(post_id=pid).first()
+    if post.created_at == post.updated_at:
+        post.updated_at = ""
+    return post
