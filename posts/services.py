@@ -4,6 +4,19 @@ from fastapi import Depends
 from . import model, schema
 from users import model as user_model
 from sqlalchemy import desc, asc
+from starlette.authentication import requires
+
+def create_post(db, post):
+    postData = model.Post(
+        user_id = post.user_id, 
+        title = post.title,
+        content = post.content
+    )
+    db.add(postData)
+    db.commit()
+    db.refresh(postData)
+    return postData
+    
 
 def get_posts(db, pagenation):
     # 정렬 방향 설정
