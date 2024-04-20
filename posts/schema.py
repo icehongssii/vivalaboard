@@ -24,3 +24,11 @@ class PostWrite(Post):
 
 class PostEditReq(PostWrite):
     post_id:int
+
+class PostView(Post):
+    post_id: int
+    username: str = None
+    user_id: int
+    title: str
+    views: int
+    

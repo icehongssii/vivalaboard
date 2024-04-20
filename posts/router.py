@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request, HTTPException
 from . import services, schema
-from typing import Annotated
+from typing import Annotated, List
 from sqlalchemy.orm import Session
 from db import get_db
 router = APIRouter()
@@ -19,7 +19,7 @@ def delete_post(req:Request,post_id:int, db:Session=Depends(get_db)):
     return {"result":"success", "deleted_post_id":post_id}
 
 # 기본페이지
-@router.get("/")
+@router.get("/", response_model=List[schema.PostView])
 def get_post_list(pagenation=Depends(schema.Pagination), db:Session = Depends(get_db)):
     return services.get_posts(db,pagenation)
 
