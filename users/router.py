@@ -10,6 +10,15 @@ now = datetime.now(KST)
 router = APIRouter()
 OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="token")
 
+# 유저가 회원탈퇴 버튼 눌렀을때 일어나는일 delete 메서드사용
+@router.delete("/{user_id}")
+def user_delete(req:Request,user_id:int, db:Session=Depends(get_db)):
+    if not req.user:    
+        raise HTTPException(status_code=403, detail = "로그인하고오세요!")
+    current_user = int(req.user)
+    if current_user != user_id:
+        raise HTTPException(status_code=403, detail="본인만 회원탈퇴가능")
+    return services.delete_user(db, user_id)
 
 # 정보수정 완료 버튼 눌렀을때
 # 수정완료가 일어난다
