@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import update
+from sqlalchemy import update, delete
 from . import model, schema
 from auth import model as authModel
 from passlib.context import CryptContext
@@ -9,6 +9,12 @@ from core import auth
 KST = timezone(timedelta(hours=9))
 now = datetime.now(KST)
 PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def delete_user(db, user_id):
+    qry = delete(model.User).where(model.User.user_id == user_id)
+    db.execute(qry)
+    db.commit()
+    return user_id
 
 def create_user(db: Session, user:schema.UserCreate) -> model.User:
     hashed_pwd = return_hashed_password(user.password.get_secret_value())
