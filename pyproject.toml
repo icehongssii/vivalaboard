@@ -18,6 +18,15 @@ email-validator = "^2.1.1"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+pytest-cov = "^5.0.0"
+black = "^24.4.0"
+isort = "^5.13.2"
+flake8 = "^7.0.0"
+bandit = "^1.7.8"
+safety = "^3.1.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
