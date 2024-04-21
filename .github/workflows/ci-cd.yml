@@ -2,9 +2,9 @@ name: Python application CI
 
 on:
   push:
-    branches: [ "feature/17-ci-yaml" ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "feature/17-ci-yaml" ]
+    branches: [ "develop" ]
 
 permissions:
   contents: read
