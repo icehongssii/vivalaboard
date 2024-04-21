@@ -10,7 +10,8 @@ permissions:
   contents: read
 
 jobs:
-  build:
+
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -19,37 +20,21 @@ jobs:
         with:
           python-version: "3.10"
       - name: Install dependencies
-        run: |
+        run: 
           python -m pip install --upgrade pip
           pip install poetry
+      - name: Setup a local virtual environment (if no poetry.toml file)
+        run: |
           poetry config virtualenvs.create true --local
           poetry config virtualenvs.in-project true --local
-          poetry install
       - uses: actions/cache@v3
+        name: Define a cache for the virtual environment based on the dependencies lock file
         with:
-          path: .venv
-          key: ${{ runner.os }}-venv-${{ hashFiles('**/poetry.lock') }}
-      - name: Upload virtual environment as artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: venv
-          path: .venv
-
-  code-quality:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Download virtual environment
-        uses: actions/download-artifact@v2
-        with:
-          name: venv
-          path: .venv
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v3
-        with:
-          python-version: "3.10"
-      - name: Code Quality Checks
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
+      - name: Install the project dependencies
+        run: poetry install
+      - name: code-quality
         run: |
           poetry run flake8 . --max-line-length=120 --exclude=.git,build,dist,migrations,.venv --max-complexity=10 --docstring-style=sphinx
           poetry run black . --check
