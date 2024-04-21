@@ -36,6 +36,6 @@ jobs:
         run: poetry install
       - name: code-quality
         run: |
-          poetry run flake8 . --max-line-length=120 --exclude=.git,build,dist,migrations,.venv --max-complexity=10 --docstring-style=sphinx
+          poetry run flake8 . --max-line-length=120 --exclude=.git,build,dist,migrations,.venv --max-complexity=10
           poetry run black . --check
           poetry run isort . --check-only --profile black
