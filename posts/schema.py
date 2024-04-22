@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr,Field, SecretStr, field_validator
 from datetime import datetime
 from enum import Enum
+from typing import Optional
 
 class SortPosts(Enum):
     ASC = "asc"
@@ -29,4 +30,10 @@ class PostView(Post):
     user_id: int
     title: str
     views: int
-    
+
+class PostResponse(BaseModel):
+    post_id: int
+    user_id: Optional[int]
+    title: str
+    views: int
+    username: str
