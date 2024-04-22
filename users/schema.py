@@ -1,6 +1,4 @@
 from pydantic import BaseModel, EmailStr, SecretStr, field_validator
-
-
 # Password를 사용한 이유는 로깅할 대 **로 찍히게 할려고
 # 근데 Password에서 밸리데이션 체크를 할려고하는데 안된다
 # 왜냐면 password = value.get_secret_value()  # SecretStr의 값을 얻기위해선 이런 작업을 필요로하기때문
@@ -24,7 +22,10 @@ class UserBase(BaseModel):
 # 유저가 회원가입할떄는  username, email, password만 잇으면된다 
 class UserCreate(UserBase):
     username: str = None
-    password: SecretStr = None
+    password: SecretStr
+    
+    # TODO @icehongssii 24022 아래 정규식 곧바로 사용시 에러발생
+    #      error: look-around, including look-ahead and look-behind, is not supported
     # 아래의 field_validor대신에 regular expression을 쓰는 것도 방법이다
     # regex=r'(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*])'
     
