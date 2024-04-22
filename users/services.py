@@ -3,10 +3,9 @@ from sqlalchemy import update, delete
 from . import model, schema
 from auth import model as authModel
 from passlib.context import CryptContext
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from core import auth
 
-KST = timezone(timedelta(hours=9))
 PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def delete_user(db, user_id):
@@ -24,8 +23,7 @@ def create_user(db: Session, user:schema.UserCreate) -> model.User:
     return db_user
 
 def update_user_info(db: Session, user:schema.UserEdit):
-    password = user.password
-    # 비밀번호를 바꾸고 싶다면 
+    password = return_hashed_password(user.password.get_secret_value()) 
     if user.new_password:
         password = return_hashed_password(user.new_password.get_secret_value()) 
     qry =update(model.User).where(model.User.user_id == user.user_id)\
@@ -47,25 +45,36 @@ def return_hashed_password(password):
     return PWD_CONTEXT.hash(password)
 
 def generate_login_token(db: Session, user_info:schema.UserLogin):
-    rt  = auth.generate_tokens(user_info.user_id, datetime.now(KST) + timedelta(minutes=10))    
+    from config import get_settings
+    from datetime import timedelta
+    import pytz
+    
+    settings = get_settings()
+    KST = pytz.timezone(settings.TIMEZONE)
+    
+    rt  = auth.generate_tokens(user_id=user_info.user_id, 
+                               expire_time=datetime.now(KST)
+                                            + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINS))    
 
-    # 업서트
     token = db.query(authModel.RefreshToken).filter_by(user_id=user_info.user_id).first()
     if token:
         token.token = rt
-        token.expires_at = datetime.now(KST) + timedelta(minutes=1440),
+        token.expires_at = datetime.now(KST) + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINS)
         token.created_at = datetime.now(KST)
     else:
         token = authModel.RefreshToken(
             user_id=user_info.user_id,
             token=rt,
-            expires_at=datetime.now(KST) + timedelta(minutes=1440),
+            expires_at=datetime.now(KST) + 
+                        timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINS),
             created_at=datetime.now(KST)
         )
         db.add(token)
     db.commit()
     db.refresh(token)
         
-    at  = auth.generate_tokens(user_info.user_id, datetime.now(KST) + timedelta(minutes=1440))
+    at  = auth.generate_tokens(user_info.user_id, 
+                               datetime.now(KST) 
+                               + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINS))
     
     return {"refresh_token":rt, "access_token":at}

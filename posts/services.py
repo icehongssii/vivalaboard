@@ -1,11 +1,14 @@
 
-from db import get_db
-from fastapi import Depends
 from . import model, schema
 from users import model as user_model
 from sqlalchemy import desc, asc,update, delete,func
-from datetime import datetime, timedelta, timezone
-KST = timezone(timedelta(hours=9))
+from datetime import datetime
+from config import get_settings
+import pytz
+
+settings = get_settings()
+KST = pytz.timezone(settings.TIMEZONE)
+
 
 def delete_post(db, post_id):
     qry = delete(model.Post).where(model.Post.post_id==post_id)
@@ -16,7 +19,7 @@ def delete_post(db, post_id):
 def get_writer_id(db, post_id):
     return db.query(model.Post).filter(model.Post.post_id==post_id).first()
 
-def edit_post(db,post):    
+def edit_post(db,post):
     update_stmt = update(model.Post).where(model.Post.post_id == post.post_id)\
                       .values(content=post.content, 
                               title=post.title, 

@@ -1,9 +1,54 @@
 # vivalaboard
 
+## 프로젝트 요구 사항
 
+- 회원 CRUD
+
+- 게시판 CRUD
+
+## 프로젝트 로컬에서 시작해보기
+
+DB 실행
+```
+$ sh up.sh 
+```
+
+어플리케이션 실행
+```
+$ poetry install
+$ poetry shell
+$ uvicorn app:app --reload
+```
+
+게시글 읽어보기
+
+```
+$ curl -X 'GET' http://localhost:8000/posts/  -H 'accept: application/json
+```
+
+DB 종료 
+```
+$ sh down.sh
+```
+
+
+## 프로젝트를 하면서 알게 된 점은?
+
+- xxx.icehongssii.xyz (to be continued .. )
+
+## TODO
+
+- CI 파이프라인, tests 폴더 경로 변경/github action 변경
+
+- 게시글 유닛테스트
+
+- 회원 response 타입
+
+
+## 워크플로우
 
 - 깃허브 프로젝트설정 및 워크플로우 정의
-- 커밋
+
 ```
 #   <타입> 리스트
 #   Feat        : 새로운 기능 추가
@@ -36,4 +81,4 @@
 	- 기본회원기능(로그인/회원가입/수정/탈퇴)
 	- 기본게시판기능(CRUD/리스팅및소팅)
 - 프로젝트 환경설정 중 db 도커파일 만들기
-- 
+

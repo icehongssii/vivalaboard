@@ -2,6 +2,10 @@ import pytest
 from fastapi.testclient import TestClient
 from app import app
 import pytest
+from config import get_settings, Settings
+
+def get_settings_override():
+    return Settings(testing=1)
 
 @pytest.fixture(scope="module")
 def test_client():
