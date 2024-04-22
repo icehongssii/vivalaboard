@@ -1,8 +1,5 @@
 from sqlalchemy import  Column, Integer, String,DateTime, func,ForeignKey, Text
 from db import Base
-from datetime import datetime, timezone, timedelta
-KST = timezone(timedelta(hours=9))
-now = datetime.now(KST)
 
 class Post(Base):
     __tablename__ = "POSTS"
