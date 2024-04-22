@@ -1,5 +1,27 @@
 import pytest
 from users.model import User
+from fastapi import Request
+from starlette.status import HTTP_403_FORBIDDEN
+
+"""회원 탈퇴"""
+@pytest.mark.parametrize("token, user_id_in_path, expected_status, expected_detail", [
+    ("expired", 1, 403, "로그인하고오세요!"),
+    ("invalid", 1, 403, "로그인하고오세요!"),
+    ("1", 2, 403, "본인만 회원탈퇴가능")
+])
+def test_user_delete_failure(test_client,monkeypatch, token, user_id_in_path, expected_status, expected_detail):
+    def fake_get_token_payload(token):
+        if token in ["expired", "invalid"]:
+            return None  # 토큰이 만료되었거나 잘못되었을 때
+        return {"sub": "1"}  # 유효한 토큰일 때, 사용자 ID '1'을 반환
+
+    # Monkeypatch the token validation method
+    monkeypatch.setattr('core.auth.get_token_payload', fake_get_token_payload)
+
+    response = test_client.delete(f"/users/{user_id_in_path}", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == expected_status
+    assert response.json().get("detail") == expected_detail
+
 
 
 """로그인"""
