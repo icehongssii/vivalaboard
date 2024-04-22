@@ -1,24 +1,29 @@
 import pytest
+from users import schema, services
 from users.model import User
 from fastapi import Request
 from starlette.status import HTTP_403_FORBIDDEN
 
-"""회원 탈퇴"""
-@pytest.mark.parametrize("token, user_id_in_path, expected_status, expected_detail", [
-    ("expired", 1, 403, "로그인하고오세요!"),
-    ("invalid", 1, 403, "로그인하고오세요!"),
-    ("1", 2, 403, "본인만 회원탈퇴가능")
+@pytest.mark.parametrize("token, user_id_in_path, password, expected_status, expected_detail", [
+    ("valid", 1, "incorrect_password", 403, "비밀번호가 틀려서 안됨"),  # 비밀번호가 잘못 입력된 경우
+    ("expired", 1, "correct_password", 403, "로그인하고오세요!"),       # 토큰이 만료된 경우
+    ("invalid", 1, "correct_password", 403, "로그인하고오세요!"),       # 잘못된 토큰인 경우
+    ("valid", 2, "correct_password", 403, "본인만 회원탈퇴가능")        # 다른 사용자의 ID로 접근 시도한 경우
 ])
-def test_user_delete_failure(test_client,monkeypatch, token, user_id_in_path, expected_status, expected_detail):
-    def fake_get_token_payload(token):
-        if token in ["expired", "invalid"]:
-            return None  # 토큰이 만료되었거나 잘못되었을 때
-        return {"sub": "1"}  # 유효한 토큰일 때, 사용자 ID '1'을 반환
+def test_user_delete_failure(test_client, monkeypatch, token, user_id_in_path, password, expected_status, expected_detail):
+    # 가짜 사용자 객체
+    fake_user = type('User', (object,), {"user_id": user_id_in_path, "password": "hashed_password"})
 
-    # Monkeypatch the token validation method
-    monkeypatch.setattr('core.auth.get_token_payload', fake_get_token_payload)
+    # 비밀번호 재검증
+    def fake_verify_password(provided_password, actual_password):
+        return provided_password == "correct_password" and actual_password == "hashed_password"
 
-    response = test_client.delete(f"/users/{user_id_in_path}", headers={"Authorization": f"Bearer {token}"})
+    monkeypatch.setattr('core.auth.get_token_payload', lambda token: None if token in ["expired", "invalid"] else  {"sub":1})  # 토큰 검증 함수를 가짜로 교체
+    monkeypatch.setattr('core.auth.get_current_user_by_id', lambda user_id, db: fake_user if user_id == 1 else None)  # 사용자 검색 함수를 가짜로 교체
+    monkeypatch.setattr('users.services.verify_password', fake_verify_password)  
+    
+    response = test_client.post("/users/delete", headers={"Authorization": f"Bearer {token}"}, json={"user_id": user_id_in_path, "password": password})
+    
     assert response.status_code == expected_status
     assert response.json().get("detail") == expected_detail
 

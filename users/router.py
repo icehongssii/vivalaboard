@@ -43,11 +43,11 @@ def user_delete(req: Request, user:schema.UserDelete, db: Session = Depends(get_
     # 사용자의 비밀번호를 데이터베이스에서 가져오기
     user = auth.get_current_user_by_id(user_id, db)
     if not user:
-        raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다.")
+        raise HTTPException(status_code=403, detail="사용자를 찾을 수 없습니다.")
     
     # 비밀번호 확인
     if not services.verify_password(password, user.password):
-        raise HTTPException(status_code=401, detail="비밀번호가 틀려서 안됨")
+        raise HTTPException(status_code=403, detail="비밀번호가 틀려서 안됨")
     
     # 회원탈퇴 처리
     services.delete_user(db, user_id)
