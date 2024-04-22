@@ -42,7 +42,7 @@ def validate_user_with_pwd(req:Request, pwd:schema.UserValidate, db:Session=Depe
     user_id = int(req.user)
     db_pwd = services._get_current_user(db,user_id).password   
     if not services.verify_password(pwd.password.get_secret_value(), db_pwd):
-        raise HTTPException(status_code=403, detail="비밀번호가 틀려서 안됨")
+        raise HTTPException(status_code=401, detail="비밀번호가 틀려서 안됨")
     return True
 
 
@@ -50,7 +50,7 @@ def validate_user_with_pwd(req:Request, pwd:schema.UserValidate, db:Session=Depe
 @router.post("/join")
 def create_user(user: schema.UserCreate, db:Session = Depends(get_db)):
     if services.find_user_with_email(db, user.email):
-        raise HTTPException(status_code=400, detail = "같은 이메일 존재")     
+        raise HTTPException(status_code=403, detail = "같은 이메일 존재")     
     return services.create_user(db,user)
 
 # /users/join
@@ -60,10 +60,10 @@ def login_user(user: schema.UserLogin, db:Session = Depends(get_db)):
 
     # 이메일이 잘못되었으면 빡구
     if not user_info:
-        raise HTTPException(status_code=400, detail = "이메일 정보가 없어요")     
+        raise HTTPException(status_code=403, detail = "이메일 정보가 없어요")     
     
     # 이메일 맞아도 비밀번호가 잘못되었으면 빡구
     if not services.verify_password(user.password.get_secret_value(), user_info.password):
-        raise HTTPException(status_code=400, detail = "비밀번호가 틀렸어요")
+        raise HTTPException(status_code=403, detail = "비밀번호가 틀렸어요")
     
     return services.generate_login_token(db,user_info)
