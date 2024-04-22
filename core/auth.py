@@ -48,10 +48,11 @@ def get_token_payload(token):
         return None
     return payload    
 
-def get_current_user(user_id,db=None):
+def get_current_user_by_id(user_id,db=None):
+    from users.model import User
     if not db:
         db = get_db()
-    user = db.query(model.User).filter(model.User.user_id == user_id).first()
+    user = db.query(User).filter(User.user_id == user_id).first()
     return user
     
 

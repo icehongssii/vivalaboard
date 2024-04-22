@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr,Field, SecretStr, field_validator
 from datetime import datetime
 from enum import Enum
+from typing import Optional
 
 class SortPosts(Enum):
     ASC = "asc"
@@ -11,8 +12,6 @@ class Pagination(BaseModel):
     perPage: int = 5
     sort_column: str = 'created_at'
     order_direction: SortPosts = SortPosts.DESC
-    class Config:
-        orm_mode = True
 
 class Post(BaseModel):
     pass
@@ -31,4 +30,10 @@ class PostView(Post):
     user_id: int
     title: str
     views: int
-    
+
+class PostResponse(BaseModel):
+    post_id: int
+    user_id: Optional[int]
+    title: str
+    views: int
+    username: str

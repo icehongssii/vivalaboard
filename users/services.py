@@ -7,7 +7,6 @@ from datetime import datetime, timedelta, timezone
 from core import auth
 
 KST = timezone(timedelta(hours=9))
-now = datetime.now(KST)
 PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def delete_user(db, user_id):
@@ -21,13 +20,17 @@ def create_user(db: Session, user:schema.UserCreate) -> model.User:
     db_user = model.User(email=user.email, username=user.username, password=hashed_pwd)
     db.add(db_user)
     db.commit()
-    db.refresh(db_user) # refresh your instance (so that it contains any new data from the database, like the generated ID).
+    db.refresh(db_user)
     return db_user
 
 def update_user_info(db: Session, user:schema.UserEdit):
+    password = user.password
+    # 비밀번호를 바꾸고 싶다면 
+    if user.new_password:
+        password = return_hashed_password(user.new_password.get_secret_value()) 
     qry =update(model.User).where(model.User.user_id == user.user_id)\
         .values(username=user.username,
-                password=user.password.get_secret_value()
+                password=password
                 )
     db.execute(qry)
     db.commit()
@@ -44,7 +47,6 @@ def return_hashed_password(password):
     return PWD_CONTEXT.hash(password)
 
 def generate_login_token(db: Session, user_info:schema.UserLogin):
-    #  로그인을 위한 토큰발행 그리고 디비 업뎃
     rt  = auth.generate_tokens(user_info.user_id, datetime.now(KST) + timedelta(minutes=10))    
 
     # 업서트
@@ -66,4 +68,4 @@ def generate_login_token(db: Session, user_info:schema.UserLogin):
         
     at  = auth.generate_tokens(user_info.user_id, datetime.now(KST) + timedelta(minutes=1440))
     
-    return {"rt":rt, "at":at}
+    return {"refresh_token":rt, "access_token":at}

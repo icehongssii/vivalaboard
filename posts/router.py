@@ -18,10 +18,12 @@ def delete_post(req:Request,post_id:int, db:Session=Depends(get_db)):
     print(services.delete_post(db,post_id),"삭제")
     return {"result":"success", "deleted_post_id":post_id}
 
-# 기본페이지
-@router.get("/", response_model=List[schema.PostView])
+# 기본페이지, 페이지
+@router.get("/", response_model=List[schema.PostResponse])
 def get_post_list(pagenation=Depends(schema.Pagination), db:Session = Depends(get_db)):
-    return services.get_posts(db,pagenation)
+    res = services.get_posts(db,pagenation)
+    return [schema.PostResponse(user_id=result.user_id, title=result.title, post_id=result.post_id,
+                                views=result.views, username=result.username) for result in res]
 
 @router.get("/view")
 # /posts/view?post_id=11
