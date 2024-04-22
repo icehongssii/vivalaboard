@@ -63,11 +63,14 @@ class UserCreate(UserBase):
 class UserLogin(UserBase):
     password: SecretStr
 
-class UserValidate(BaseModel):
+class UserDelete(BaseModel):
+    user_id: int
     password: SecretStr
 
 class UserEdit(BaseModel):
     user_id: int = None
     username: str = None
     password: SecretStr
-        
+
+class UserView(BaseModel):
+    user_id: int
