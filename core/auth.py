@@ -30,7 +30,7 @@ class TokenAuthBackend(AuthenticationBackend):
         return AuthCredentials(["authenticated"]), user_id
         
         
-def get_token_payload(token, settings:Settings=Depends(get_settings)):
+def get_token_payload(token):
     try:
         payload = jwt.decode(token, settings.JWT_SECRET, 
                              algorithms=[settings.JWT_ALGORITHM])
