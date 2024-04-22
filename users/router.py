@@ -27,10 +27,11 @@ def edit_user_info(req: Request, user: schema.UserEdit, db: Session = Depends(ge
     
     # 기존비밀번호와 맞는지 재확인
     if not services.verify_password(curret_password, db_user.password):
-        raise HTTPException(status_code=401, detail="기존 비밀번호가 맞지 않습니다.")
+        raise HTTPException(status_code=403, detail="기존 비밀번호가 맞지 않습니다.")
 
-    #정보 업데이트            
-    services.update_user_info(db, user)
+    #정보 업데이트          
+    user.user_id = user_id  
+    return services.update_user_info(db, user)
     return {"message": "사용자 정보가 성공적으로 업데이트되었습니다."}
 
 
