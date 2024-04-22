@@ -71,6 +71,7 @@ class UserEdit(BaseModel):
     user_id: int = None
     username: str = None
     password: SecretStr
+    new_password: SecretStr = None # 새 비밀번호로 수정하고 싶다면
 
 class UserView(BaseModel):
     user_id: int

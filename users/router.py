@@ -11,17 +11,28 @@ now = datetime.now(KST)
 router = APIRouter()
 OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="token")
 
-# 정보수정 완료 버튼 눌렀을때
-# 수정완료가 일어난다
-# 정보
+"""회원 정보 수정"""
 @router.post("/edit")
-def edit_user_info(req:Request, user:schema.UserEdit, db:Session=Depends(get_db)):
+def edit_user_info(req: Request, user: schema.UserEdit, db: Session = Depends(get_db)):
+    curret_password = user.password.get_secret_value()
+    
+    # 토큰이 잘못되었을 경우(invalid 또는 expired)
     if not req.user:
-        raise HTTPException(status_code=403, detail = "로그인하고오세요!")     
+        raise HTTPException(status_code=403, detail="로그인하고오세요!")
+    
     user_id = int(req.user)
-    user.user_id = user_id
-    return services.update_user_info(db,user)
+    db_user = auth.get_current_user_by_id(user_id, db)
+    
+    if not db_user:
+        raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다.")
+    
+    # 기존비밀번호와 맞는지 재확인
+    if not services.verify_password(curret_password, db_user.password):
+        raise HTTPException(status_code=401, detail="기존 비밀번호가 맞지 않습니다.")
 
+    #정보 업데이트            
+    services.update_user_info(db, user)
+    return {"message": "사용자 정보가 성공적으로 업데이트되었습니다."}
 
 
 """회원탈퇴"""

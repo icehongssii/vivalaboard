@@ -25,9 +25,15 @@ def create_user(db: Session, user:schema.UserCreate) -> model.User:
     return db_user
 
 def update_user_info(db: Session, user:schema.UserEdit):
+    password  = user.password
+    
+    # 비밀번호를 바꾸고 싶다면 
+    if user.new_password:
+        password = return_hashed_password(user.new_password.get_secret_value())
+        
     qry =update(model.User).where(model.User.user_id == user.user_id)\
         .values(username=user.username,
-                password=user.password.get_secret_value()
+                password=password
                 )
     db.execute(qry)
     db.commit()
