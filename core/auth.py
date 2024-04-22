@@ -1,21 +1,15 @@
-from starlette.middleware.authentication import (
-    AuthenticationMiddleware,AuthenticationError,AuthCredentials,UnauthenticatedUser)
+from starlette.middleware.authentication import AuthCredentials
 from fastapi import Request, Depends
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
+from datetime import datetime
+import pytz
 from jose import jwt,JWTError,ExpiredSignatureError
-from auth import model 
 from db import get_db
-from datetime import datetime, timedelta, timezone
-KST = timezone(timedelta(hours=9))
-now = datetime.now(KST)
-
-ACCESS_TOKEN_EXPIRED_MINUTES=1
-REFRESH_TOKEN_EXPIRED_MINUTES=60*24
-ALGORITHM="HS256"
-SECRET = "5d7253c2dc63339f8718bffdcd38302ed9e0bc8a8d4fc4bdca2d0be7f2de84ee1ad71189b36bc2b850c879983566def29453cb46417915831df074b89d44193f"
+from config import Settings, get_settings
+from datetime import datetime
 from starlette.authentication import AuthenticationBackend
 
+settings = get_settings()
 
 class TokenAuthBackend(AuthenticationBackend):
     async def authenticate(self, request: Request):
@@ -29,7 +23,6 @@ class TokenAuthBackend(AuthenticationBackend):
         token_type, _, token = auth.partition(' ')
  
         payload = get_token_payload(token)
-        # at가 만료되었거나 잘못된 형식일 경우
         if not payload:
             return None, None
         
@@ -39,16 +32,15 @@ class TokenAuthBackend(AuthenticationBackend):
         
 def get_token_payload(token):
     try:
-        payload = jwt.decode(token, SECRET, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.JWT_SECRET, 
+                             algorithms=[settings.JWT_ALGORITHM])
     except ExpiredSignatureError:
-        print("만료된토큰")
         return None
     except JWTError:
-        print("이상한토큰")
         return None
     return payload    
 
-def get_current_user_by_id(user_id,db=None):
+def get_current_user_by_id(user_id,db:Session=Depends(get_db)):
     from users.model import User
     if not db:
         db = get_db()
@@ -57,14 +49,16 @@ def get_current_user_by_id(user_id,db=None):
     
 
 # create token
-def generate_tokens(user_id, exp):    
+def generate_tokens(user_id, expire_time):
     payload = {
         "sub": str(user_id),
-        "iat": datetime.now(),
-        "exp": exp,
+        "iat": datetime.now(pytz.timezone(settings.TIMEZONE)),
+        "exp": expire_time,
         "iss": "vivalaboard",
     }
-    return jwt.encode(payload, SECRET, algorithm=ALGORITHM)
+    return jwt.encode(payload, 
+                      settings.JWT_SECRET, 
+                      algorithm=settings.JWT_ALGORITHM)
 
 
 
