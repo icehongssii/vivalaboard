@@ -11,8 +11,6 @@ class Pagination(BaseModel):
     perPage: int = 5
     sort_column: str = 'created_at'
     order_direction: SortPosts = SortPosts.DESC
-    class Config:
-        orm_mode = True
 
 class Post(BaseModel):
     pass
