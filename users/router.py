@@ -7,7 +7,6 @@ from db import get_db
 from core import auth
 
 KST = timezone(timedelta(hours=9))
-now = datetime.now(KST)
 router = APIRouter()
 OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -68,7 +67,7 @@ def user_delete(req: Request, user:schema.UserDelete, db: Session = Depends(get_
 @router.post("/join")
 def create_user(user: schema.UserCreate, db:Session = Depends(get_db)):
     if services.find_user_with_email(db, user.email):
-        raise HTTPException(status_code=403, detail = "같은 이메일 존재")     
+        raise HTTPException(status_code=403, detail = "중복된 이메일 존재")     
     return services.create_user(db,user)
 
 # /users/join
@@ -78,10 +77,10 @@ def login_user(user: schema.UserLogin, db:Session = Depends(get_db)):
 
     # 이메일이 잘못되었으면 빡구
     if not user_info:
-        raise HTTPException(status_code=403, detail = "이메일 정보가 없어요")     
+        raise HTTPException(status_code=403, detail = "사용자를 찾을 수 없습니다.")
     
     # 이메일 맞아도 비밀번호가 잘못되었으면 빡구
     if not services.verify_password(user.password.get_secret_value(), user_info.password):
-        raise HTTPException(status_code=403, detail = "비밀번호가 틀렸어요")
+        raise HTTPException(status_code=403, detail = "기존 비밀번호가 맞지 않습니다.")
     
     return services.generate_login_token(db,user_info)
