@@ -32,5 +32,14 @@ $ sh down.sh
 ```
 
 
+## 프로젝트를 하면서 알게 된 점은?
+
+- xxx.icehongssii.xyz (to be continued .. )
+
 ## TODO
-- 
+
+- CI 파이프라인, tests 폴더 경로 변경/github action 변경
+
+- 게시글 유닛테스트
+
+- 회원 response 타입
