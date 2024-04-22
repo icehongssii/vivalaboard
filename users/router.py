@@ -51,7 +51,7 @@ def user_delete(req: Request, user:schema.UserDelete, db: Session = Depends(get_
         raise HTTPException(status_code=403, detail="사용자를 찾을 수 없습니다.")
     
     if not services.verify_password(password, user.password):
-        raise HTTPException(status_code=403, detail="비밀번호가 틀려서 안됨")
+        raise HTTPException(status_code=403, detail="비밀번호 확인이 필요합니다.")
     
     services.delete_user(db, user_id)
     return {"detail": "회원 탈퇴가 완료되었습니다."}
@@ -72,6 +72,6 @@ def login_user(user: schema.UserLogin, db:Session = Depends(get_db)):
         raise HTTPException(status_code=403, detail = "사용자를 찾을 수 없습니다.")
     
     if not services.verify_password(user.password.get_secret_value(), user_info.password):
-        raise HTTPException(status_code=403, detail = "기존 비밀번호가 맞지 않습니다.")
+        raise HTTPException(status_code=403, detail = "비밀번호 확인이 필요합니다.")
     
     return services.generate_login_token(db,user_info)

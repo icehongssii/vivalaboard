@@ -1,14 +1,12 @@
 import pytest
-from users import schema, services
 from users.model import User
-from fastapi import Request
-from starlette.status import HTTP_403_FORBIDDEN
 
+"""탈퇴 실패"""
 @pytest.mark.parametrize("token, user_id_in_path, password, expected_status, expected_detail", [
-    ("valid", 1, "incorrect_password", 403, "비밀번호가 틀려서 안됨"),  # 비밀번호가 잘못 입력된 경우
-    ("expired", 1, "correct_password", 403, "로그인하고오세요!"),       # 토큰이 만료된 경우
-    ("invalid", 1, "correct_password", 403, "로그인하고오세요!"),       # 잘못된 토큰인 경우
-    ("valid", 2, "correct_password", 403, "본인만 회원탈퇴가능")        # 다른 사용자의 ID로 접근 시도한 경우
+    ("valid", 1, "incorrect_password", 403, "비밀번호 확인이 필요합니다."),  # 비밀번호가 잘못 입력된 경우
+    ("expired", 1, "correct_password", 403, "로그인이 필요합니다."),       # 토큰이 만료된 경우
+    ("invalid", 1, "correct_password", 403, "로그인이 필요합니다."),       # 잘못된 토큰인 경우
+    ("valid", 2, "correct_password", 403, "잘못된 접근입니다.")        # 다른 사용자의 ID로 접근 시도한 경우
 ])
 def test_user_delete_failure(test_client, monkeypatch, token, user_id_in_path, password, expected_status, expected_detail):
     # 가짜 사용자 객체
@@ -29,10 +27,10 @@ def test_user_delete_failure(test_client, monkeypatch, token, user_id_in_path, p
 
 
 
-"""로그인"""
+"""로그인 실패"""
 @pytest.mark.parametrize("email,password,expected_status,expected_detail", [
-    ("nonexistent@example.com", "anyPassword", 403, "이메일 정보가 없어요"),
-    ("valid@example.com", "wrongPassword", 403, "비밀번호가 틀렸어요")
+    ("nonexistent@example.com", "anyPassword", 403, "사용자를 찾을 수 없습니다."),
+    ("valid@example.com", "wrongPassword", 403, "비밀번호 확인이 필요합니다.")
 ])
 def test_login_user_failure(test_client, monkeypatch, email, password, expected_status, expected_detail):
     # 이메일이 들어오면 None 리턴되면 이메일정보가 없다고 return됨
@@ -40,12 +38,11 @@ def test_login_user_failure(test_client, monkeypatch, email, password, expected_
     # password, hashedpwd가 들어오지만 항상 False를 리턴하는 케이스 따라서 항상 False가 리턴된다
     monkeypatch.setattr('users.services.verify_password', lambda password, hashed: False)
 
-
     response = test_client.post("/users/login", json={"email": email, "password": password})
     assert response.status_code == expected_status
     assert response.json().get("detail") == expected_detail
 
-"""회원가입"""
+"""회원가입 실패"""
 # TODO @icehongssii expected_detail 추가하기
 #   assert response.json().get("detail") == expected_detail
 @pytest.mark.parametrize("username,email,password,expected_status,expected_detail", [
