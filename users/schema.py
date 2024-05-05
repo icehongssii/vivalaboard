@@ -51,11 +51,12 @@ class UserLogin(BaseModel):
     password: SecretStr
 
 class UserDelete(BaseModel):
-    user_id: int
     password: SecretStr
 
 class UserEdit(UserPassword):
-    user_id:Optional[int] = None
+    # 수정페이지로 들어갈땐 user_id가 필요없고(토큰에 있으니)
+    # 수정 완료 버튼을 누를 땐 user_id가 필요하므로 option에 넣는다
+    user_id:Optional[int] = None 
     username: str = None
     password: SecretStr
     new_password: Optional[SecretStr] = None
