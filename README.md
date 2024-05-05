@@ -34,7 +34,10 @@ $ sh down.sh
 
 ## 프로젝트를 하면서 알게 된 점은?
 
+- `현재 공사중인 제 블로그에 작성 중입니다`
+- 해당 블로그는 fastAPI를 이용한 동적페이지로 구성해 ecs로 배포했지만그럴 필요가 없단 걸 깨달았습니다 ..  정적페이지들로 구성해 githubpage로 배포 할 예정입니다
 - xxx.icehongssii.xyz (to be continued .. )
+- 04249에 다시 찾아와주세요
 
 ## TODO
 
