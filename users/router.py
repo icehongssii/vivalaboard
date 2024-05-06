@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.post("/edit")
-def edit_user_info(req: Request, user: schema.UserEdit, db: Session=Depends(get_db)):
+def edit_user_info(req: Request, user: schema.UserEdit, db: Session = Depends(get_db)):
     # 토큰이 잘못되었을 경우(invalid 또는 expired), 현재 미들웨러를 통해 이미 authrized된 상태이므로
     if not req.user:
         raise HTTPException(status_code=403, detail="로그인이 필요합니다.")
@@ -54,14 +54,14 @@ def user_delete(req: Request, user: schema.UserDelete, db: Session = Depends(get
 
 
 @router.post("/join")
-def create_user(user: schema.UserCreate, db: Session=Depends(get_db)):
+def create_user(user: schema.UserCreate, db: Session = Depends(get_db)):
     if services.find_user_with_email(db, user.email):
         raise HTTPException(status_code=403, detail="중복된 이메일 존재")
     return services.create_user(db, user)
 
 
 @router.post("/login")
-def login_user(user: schema.UserLogin, db: Session=Depends(get_db)):
+def login_user(user: schema.UserLogin, db: Session = Depends(get_db)):
     user_info = services.find_user_with_email(db, user.email)
 
     if not user_info:

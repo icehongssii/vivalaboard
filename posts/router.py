@@ -3,6 +3,7 @@ from . import services, schema
 from typing import List
 from sqlalchemy.orm import Session
 from db import get_db
+
 router = APIRouter()
 
 
@@ -20,19 +21,25 @@ def delete_post(req: Request, post_id: int, db: Session = Depends(get_db)):
 @router.get("/", response_model=List[schema.PostResponse])
 def get_post_list(pagenation=Depends(schema.Pagination), db: Session = Depends(get_db)):
     res = services.get_posts(db, pagenation)
-    return [schema.PostResponse(user_id=result.user_id, title=result.title,
-                                post_id=result.post_id, views=result.views,
-                                username=result.username)
-            for result in res]
+    return [
+        schema.PostResponse(
+            user_id=result.user_id,
+            title=result.title,
+            post_id=result.post_id,
+            views=result.views,
+            username=result.username,
+        )
+        for result in res
+    ]
 
 
 @router.get("/view")
-def get_one_post(post_id: int=1, db: Session=Depends(get_db)):
+def get_one_post(post_id: int = 1, db: Session = Depends(get_db)):
     return services.get_one_post(db, post_id)
 
 
 @router.post("/edit")
-def edit_post(req: Request, post: schema.PostEditReq, db: Session=Depends(get_db)):
+def edit_post(req: Request, post: schema.PostEditReq, db: Session = Depends(get_db)):
     # 실제로 클라이언트에서 요청을 보낼땐
     # post.user_id가 바뀔수가 없다
     writer = services.get_writer_id(db, post.post_id).user_id
@@ -46,7 +53,7 @@ def edit_post(req: Request, post: schema.PostEditReq, db: Session=Depends(get_db
 
 
 @router.post("/write")
-def write_post(req: Request, post: schema.PostWrite, db: Session=Depends(get_db)):
+def write_post(req: Request, post: schema.PostWrite, db: Session = Depends(get_db)):
     user_id = req.user
     if not user_id:
         raise HTTPException(status_code=403, detail="로그인하고오세요!")

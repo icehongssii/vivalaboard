@@ -12,10 +12,10 @@ load_dotenv(dotenv_path=env_path)
 class Settings(BaseSettings):
     # App
     DEBUG: bool = bool(os.environ.get("DEBUG", 0))
-    ENV: str = os.environ.get("ENV", 'dev')
+    ENV: str = os.environ.get("ENV", "dev")
 
     # TIMEZONE
-    TIMEZONE: str = os.environ.get("TIMEZONE", 'Asia/Seoul')
+    TIMEZONE: str = os.environ.get("TIMEZONE", "Asia/Seoul")
 
     # DB
     MYSQL_HOST: str = os.environ.get("MYSQL_HOST")

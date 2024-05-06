@@ -16,5 +16,5 @@ def test_client():
 
 @pytest.fixture
 def mock_db_session():
-    session = 'dd'
+    session = "dd"
     return session

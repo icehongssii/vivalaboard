@@ -20,7 +20,7 @@ class TokenAuthBackend(AuthenticationBackend):
             return None, None
 
         auth = request.headers["Authorization"]
-        token_type, _, token = auth.partition(' ')
+        token_type, _, token = auth.partition(" ")
 
         payload = get_token_payload(token)
         if not payload:
@@ -32,8 +32,7 @@ class TokenAuthBackend(AuthenticationBackend):
 
 def get_token_payload(token):
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET,
-                             algorithms=[settings.JWT_ALGORITHM])
+        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
     except ExpiredSignatureError:
         return None
     except JWTError:
@@ -43,6 +42,7 @@ def get_token_payload(token):
 
 def get_current_user_by_id(user_id, db: Session = Depends(get_db)):
     from users.model import User
+
     if not db:
         db = get_db()
     user = db.query(User).filter(User.user_id == user_id).first()
@@ -57,6 +57,4 @@ def generate_tokens(user_id, expire_time):
         "exp": expire_time,
         "iss": "vivalaboard",
     }
-    return jwt.encode(payload,
-                      settings.JWT_SECRET,
-                      algorithm=settings.JWT_ALGORITHM)
+    return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)

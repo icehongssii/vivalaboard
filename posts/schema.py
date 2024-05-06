@@ -11,7 +11,7 @@ class SortPosts(Enum):
 class Pagination(BaseModel):
     page: int = 1
     perPage: int = 5
-    sort_column: str = 'created_at'
+    sort_column: str = "created_at"
     order_direction: SortPosts = SortPosts.DESC
 
 
