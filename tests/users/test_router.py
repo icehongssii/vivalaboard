@@ -1,6 +1,6 @@
 import pytest
-from users.model import User
 
+from users.model import User
 
 """탈퇴 실패"""
 

@@ -1,9 +1,10 @@
 import os
 from functools import lru_cache
-from pydantic_settings import BaseSettings
 from pathlib import Path
-from dotenv import load_dotenv
 from urllib.parse import quote_plus
+
+from dotenv import load_dotenv
+from pydantic_settings import BaseSettings
 
 env_path = Path(".") / ".env"
 load_dotenv(dotenv_path=env_path)

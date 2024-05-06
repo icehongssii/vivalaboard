@@ -1,6 +1,6 @@
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import MetaData, create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
+
 from config import get_settings
 
 settings = get_settings()

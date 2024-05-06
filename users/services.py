@@ -1,10 +1,13 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import update, delete
-from . import model, schema
-from auth import model as authModel
-from passlib.context import CryptContext
 from datetime import datetime
+
+from passlib.context import CryptContext
+from sqlalchemy import delete, update
+from sqlalchemy.orm import Session
+
+from auth import model as authModel
 from core import auth
+
+from . import model, schema
 
 PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -50,9 +53,11 @@ def return_hashed_password(password):
 
 
 def generate_login_token(db: Session, user_info: schema.UserLogin):
-    from config import get_settings
     from datetime import timedelta
+
     import pytz
+
+    from config import get_settings
 
     settings = get_settings()
     KST = pytz.timezone(settings.TIMEZONE)
