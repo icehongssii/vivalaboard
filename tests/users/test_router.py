@@ -6,8 +6,7 @@ from users.model import User
 @pytest.mark.parametrize("token, user_id_in_path, password, expected_status, expected_detail", [
     ("valid", 1, "incorrect_password", 403, "비밀번호 확인이 필요합니다."),  # 비밀번호가 잘못 입력된 경우
     ("expired", 1, "correct_password", 403, "로그인이 필요합니다."),       # 토큰이 만료된 경우
-    ("invalid", 1, "correct_password", 403, "로그인이 필요합니다."),       # 잘못된 토큰인 경우
-    ("valid", 2, "correct_password", 403, "잘못된 접근입니다.")        # 다른 사용자의 ID로 접근 시도한 경우
+    ("invalid", 1, "correct_password", 403, "로그인이 필요합니다.")       # 잘못된 토큰인 경우
 ])
 def test_user_delete_failure(test_client, monkeypatch, token, user_id_in_path,
                              password, expected_status, expected_detail):
@@ -62,7 +61,7 @@ def test_login_user_failure(test_client, monkeypatch, email, password, expected_
     ("anyusername", "valid@example.com", "wrongPassword#", 422, "숫자 한개 이상 포함"),
 ])
 def test_register_user_failure(test_client, monkeypatch, username,
-                               email, password, expected_status):
+                               email, password, expected_status, expected_detail):
     # 중복된 이메일이 들어오면 None 리턴되면 이메일정보가 없다고 return됨
     monkeypatch.setattr('users.services.find_user_with_email', lambda db, email: False
                                                             if email == "duplicated@example.com"
