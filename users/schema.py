@@ -3,14 +3,13 @@ from typing import Optional
 
 class UserPassword(BaseModel):
     _password: Optional[SecretStr] = None
-    
     # TODO @icehongssii 24022 아래 정규식 곧바로 사용시 에러발생
     #      error: look-around, including look-ahead and look-behind, is not supported
     # 아래의 field_validor대신에 regular expression을 쓰는 것도 방법이다
     # regex=r'(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*])'
-    
+
     @staticmethod
-    def pwd_must_contains( pwd: Optional[SecretStr]=None):
+    def pwd_must_contains(pwd: Optional[SecretStr]=None):
         if pwd is None:
             return None
         # SecretStr 타입 검사
@@ -33,7 +32,7 @@ class UserPassword(BaseModel):
 
     @field_validator('_password', mode="before", check_fields=False)
     def password_validator(cls, pwd: Optional[SecretStr] = None):
-        return cls.pwd_must_contains(pwd)     
+        return cls.pwd_must_contains(pwd)
 
 class UserCreate(UserPassword):
     email: EmailStr
@@ -56,7 +55,7 @@ class UserDelete(BaseModel):
 class UserEdit(UserPassword):
     # 수정페이지로 들어갈땐 user_id가 필요없고(토큰에 있으니)
     # 수정 완료 버튼을 누를 땐 user_id가 필요하므로 option에 넣는다
-    user_id:Optional[int] = None 
+    user_id: Optional[int] = None
     username: str = None
     password: SecretStr
     new_password: Optional[SecretStr] = None

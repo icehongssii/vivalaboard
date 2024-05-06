@@ -1,46 +1,48 @@
-
 from . import model, schema
 from users import model as user_model
-from sqlalchemy import desc, asc,update, delete,func
+from sqlalchemy import desc, asc, update, delete, func
 from datetime import datetime
 from config import get_settings
 import pytz
+
 
 settings = get_settings()
 KST = pytz.timezone(settings.TIMEZONE)
 
 
 def delete_post(db, post_id):
-    qry = delete(model.Post).where(model.Post.post_id==post_id)
+    qry = delete(model.Post).where(model.Post.post_id == post_id)
     db.execute(qry)
     db.commit()
     return post_id
 
-def get_writer_id(db, post_id):
-    return db.query(model.Post).filter(model.Post.post_id==post_id).first()
 
-def edit_post(db,post):
+def get_writer_id(db, post_id):
+    return db.query(model.Post).filter(model.Post.post_id == post_id).first()
+
+
+def edit_post(db, post):
     update_stmt = update(model.Post).where(model.Post.post_id == post.post_id)\
-                      .values(content=post.content, 
-                              title=post.title, 
-                              updated_at=datetime.now(KST))
+                                    .values(content=post.content,
+                                            title=post.title,
+                                            updated_at=datetime.now(KST))
     db.execute(update_stmt)
     db.commit()
-    return post    
+    return post
+
 
 def create_post(db, post):
     postData = model.Post(
-        user_id = post.user_id, 
-        title = post.title,
-        content = post.content,
-        created_at = datetime.now(KST),
-        updated_at = datetime.now(KST)
+        user_id=post.user_id,
+        title=post.title,
+        content=post.content,
+        created_at=datetime.now(KST),
+        updated_at=datetime.now(KST)
     )
     db.add(postData)
     db.commit()
     db.refresh(postData)
     return postData
-    
 
 
 def get_posts(db, pagenation):
@@ -57,6 +59,7 @@ def get_posts(db, pagenation):
         .offset((pagenation.page - 1) * pagenation.perPage)\
         .all()
     return res
+
 
 def get_one_post(db, pid):
     post = db.query(model.Post).filter_by(post_id=pid).first()
