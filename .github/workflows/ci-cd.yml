@@ -36,7 +36,7 @@ jobs:
         run: poetry install
       - name: code-quality check
         run: |
-          poetry run flake . 
+          poetry run flake8 . 
           poetry run isort . --check-only
       - uses: psf/black@stable
         name: black
