@@ -36,12 +36,7 @@ jobs:
         run: |
           poetry run flake8 . 
           poetry run isort . --check-only
-      - uses: psf/black@stable
-        name: black
-        with:
-          options: "--check --verbose"
-          src: "."
-          use_pyproject: true                  
+          poetry run black . --check
       - name: Test and coverage
         run: |
           poetry run python -m pytest --junitxml=report.xml --cov=./ --cov-report=xml tests/
