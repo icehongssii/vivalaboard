@@ -36,15 +36,19 @@ jobs:
         run: poetry install
       - name: code-quality check
         run: |
-          # @icehongssii flake, black 고쳐야할것들 발생하면 그 다음 명령어 중단됨 || true 임시로 추가
-          poetry run flake8 . --max-line-length=120 --exclude=.git,build,dist,migrations,.venv --max-complexity=10 || true 
-          poetry run black . --check || true
-          poetry run isort . --check-only --profile black || true
-      - name: Run Unit Tests
+          poetry run flake . 
+          poetry run isort . --check-only
+      - uses: psf/black@stable
+        name: black
+        with:
+          options: "--check --verbose"
+          src: "."
+          use_pyproject: true                  
+      - name: Test and coverage
         run: |
-          poetry run python -m pytest --junitxml=report.xml --cov=./ --cov-report=xml tests/unit tests/integration
+          poetry run python -m pytest --junitxml=report.xml --cov=./ --cov-report=xml tests/
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
           files: ./report.xml
-          fail_ci_if_error: true          
+          fail_ci_if_error: true

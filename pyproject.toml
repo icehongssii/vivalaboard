@@ -34,3 +34,18 @@ httpx = "^0.27.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+
+
+[tool.black]
+line-length=119
+skip_magic_trailing_comma = true
+extend-exclude = '''
+    .git
+    build
+    dist
+    migrations
+    .venv
+'''
